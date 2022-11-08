@@ -6,6 +6,8 @@ carray: .word 0:10
 
 marray: .word 0:10
 
+debug: .asciiz "DEBUGGG"
+
 encrypted: .asciiz "Encrypted: "
 decrypted: .asciiz "Decrypted: "
 comma: .asciiz ", "
@@ -37,6 +39,10 @@ main:
 	move $s6 $a3
 
 	j main_loop
+
+	li $v0 1
+	la $a0 debug
+	syscall
 
 main_loop:
 	beq $t7 $t8 print_encrypted
@@ -77,22 +83,28 @@ print_encrypted:
 	j print_encrypted_loop
 
 print_encrypted_loop:
-	#beq $t0 $t1 print_decrypted
+	bge $t0 $t1 print_decrypted
 	lw $t2 0($s5)
 
 	li $v0 1
 	move $a0 $t2
 	syscall
 
-	addiu $t0 $t0 4 
+	addiu $t0 $t0 4
 	addiu $s5 $s5 4
 
 	#if the i is less than 40, then don't include comma
-	beq $t0 $t1 print_decrypted
+	#beq $t0 $t1 print_decrypted
+
+	beq $t0 $t1 skip_comma
 
 	li $v0 4
 	la $a0 comma
 	syscall
+
+	skip_comma:
+
+	j print_encrypted_loop
 	
 print_decrypted:
 	li $v0 4
@@ -109,7 +121,7 @@ print_decrypted:
 	j print_decrypted_loop
 
 print_decrypted_loop:
-	#beq $t0 $t1 print_decrypted
+	beq $t0 $t1 exit
 	lw $t2 0($s6)
 
 	li $v0 1
@@ -120,11 +132,17 @@ print_decrypted_loop:
 	addiu $s6 $s6 4
 
 	#if the i is less than 40, then don't include comma
-	beq $t0 $t1 print_decrypted
+	#beq $t0 $t1 exit
 	
+	beq $t0 $t1 skip_comma_2
+
 	li $v0 4
 	la $a0 comma
 	syscall
+
+	skip_comma_2:
+
+	j print_decrypted_loop
 
 secret_formula_apply:
 	li $t0 7
@@ -164,7 +182,7 @@ function_end:
 	jr $ra
 
 exit:
-	li $v0, 10
+	li $v0 10
 	syscall
 
 
