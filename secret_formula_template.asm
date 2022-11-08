@@ -32,10 +32,14 @@ main:
 	move $s2 $a2
 	move $s3 $a3
 
+	move $s4 $a0
+	move $s5 $a2
+	move $s6 $a3
+
 	j main_loop
 
 main_loop:
-	beq $t7 $t8 print
+	beq $t7 $t8 print_encrypted
 	move $a0 $t5
 	move $a1 $t6
 
@@ -62,9 +66,65 @@ main_loop:
 
     j main_loop
 
-print:
-	j print_loop
+print_encrypted:
+	li $v0 4
+	la $a0 encrypted
+	syscall
 
+	li $t0 0
+	li $t1 40
+
+	j print_encrypted_loop
+
+print_encrypted_loop:
+	#beq $t0 $t1 print_decrypted
+	lw $t2 0($s5)
+
+	li $v0 1
+	move $a0 $t2
+	syscall
+
+	addiu $t0 $t0 4 
+	addiu $s5 $s5 4
+
+	#if the i is less than 40, then don't include comma
+	beq $t0 $t1 print_decrypted
+
+	li $v0 4
+	la $a0 comma
+	syscall
+	
+print_decrypted:
+	li $v0 4
+	la $a0 newline
+	syscall
+
+	li $v0 4
+	la $a0 decrypted
+	syscall
+
+	li $t0 0
+	li $t1 40
+
+	j print_decrypted_loop
+
+print_decrypted_loop:
+	#beq $t0 $t1 print_decrypted
+	lw $t2 0($s6)
+
+	li $v0 1
+	move $a0 $t2
+	syscall
+
+	addiu $t0 $t0 4 
+	addiu $s6 $s6 4
+
+	#if the i is less than 40, then don't include comma
+	beq $t0 $t1 print_decrypted
+	
+	li $v0 4
+	la $a0 comma
+	syscall
 
 secret_formula_apply:
 	li $t0 7
@@ -102,8 +162,6 @@ function_end:
 	mfhi $t4
 	move $v0 $t4
 	jr $ra
-
-
 
 exit:
 	li $v0, 10
