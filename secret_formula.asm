@@ -1,8 +1,10 @@
 .data
 
 krabby: .word 1 2 3 4 5 6 7 8 9 10
+#krabby: .word 252 126 21 1 1 1 1 1 1 1
 
-carray: .word 0:10
+#carray: .word 0:10
+carray: .word 37 23 22 1 1 1 1 1 1 1
 
 marray: .word 0:10
 
@@ -50,12 +52,12 @@ main_loop:
 	move $a1 $t6
 
 	#store arr[i] in $a2
-	lw $a2 0($s0)
+	#lw $a2 0($s0)
 
-	jal secret_formula_apply
+	#jal secret_formula_apply
 
 	#store $v0 in c_arr(i)
-	sw $v0 0($s2)
+	#sw $v0 0($s2)
 
 	#store c_arr[i] in $a2
 	lw $a2 0($s2)
