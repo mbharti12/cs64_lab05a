@@ -6,6 +6,11 @@ carray: .word 0:10
 
 marray: .word 0:10
 
+encrypted: .asciiz "Encrypted: "
+decrypted: .asciiz "Decrypted: "
+comma: .asciiz ", "
+newline: .asciiz "\n"
+
 .text
 main:
 	la $a0,krabby
@@ -16,10 +21,50 @@ main:
 	
 	#fill in your loop here
 	#feel free to use 2 loops if you need to
-	$t5 
+	li $t5 3
+	li $t6 11
+	li $t7 0
+	li $t8 40
 
+	#store argument variables into s registers
+	#use $t9 for offsetting address to store in array
+	move $s0 $a0
+	move $s2 $a2
+	move $s3 $a3
 
-	j exit
+	j main_loop
+
+main_loop:
+	beq $t7 $t8 print
+	move $a0 $t5
+	move $a1 $t6
+
+	#store arr[i] in $a2
+	lw $a2 0($s0)
+
+	jal secret_formula_apply
+
+	#store $v0 in c_arr(i)
+	sw $v0 0($s2)
+
+	#store c_arr[i] in $a2
+	lw $a2 0($s2)
+
+	jal secret_formula_remove
+
+	#store $v0 in m_arr[i]
+	sw $v0 0($s3)
+
+    addiu $t7 $t7  4
+	addiu $s0 $s0  4
+	addiu $s2 $s2  4
+	addiu $s3 $s3  4
+
+    j main_loop
+
+print:
+	j print_loop
+
 
 secret_formula_apply:
 	li $t0 7
@@ -28,6 +73,8 @@ secret_formula_apply:
 	#n
 	mflo $t1
 	li $t2 0
+
+	li $t3 1
 
 	j pow_loop
 
@@ -38,6 +85,8 @@ secret_formula_remove:
 	#n
 	mflo $t1
 	li $t2 0
+
+	li $t3 1
 
 	j pow_loop
 
@@ -53,12 +102,6 @@ function_end:
 	mfhi $t4
 	move $v0 $t4
 	jr $ra
-
-
-
-
-
-
 
 
 
